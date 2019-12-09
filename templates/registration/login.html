@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - Diálogos {% endblock %}
+
+{% block activo_login %}is-active{% endblock %}
+
+{% block content %}
+
+<div class="section">
+	<div class="container">
+		<div class="columns is-centered is-vcentered">
+			<div class="column is-narrow has-text-centered">
+				<div class="box">
+{% if form.errors %}
+  <p>Tu usuario o tu contraseña no son correctos. Inténtalo nuevamente.</p>
+{% endif %}
+
+{% if next %}
+  {% if user.is_authenticated %}
+    <p>Tu cuenta no tiene acceso a esta página. Para continuar, ingresa con una cuenta que sí tenga acceso.</p>
+  {% else %}
+    <p>Por favor, accede con tu cuenta para ver esta página.</p>
+  {% endif %}
+{% endif %}
+
+<form method="post" action="{% url 'login' %}">
+{% csrf_token %}
+
+{% for field in form %}
+<div class="field">
+	<label for="{{ field.id_for_label }}" class="label">{{ field.label }}</label>
+	{{ field }}
+</div>
+{% endfor %}
+<div class="field is-grouped">
+	<div class="control">
+		<button class="button is-link">Entrar</button>
+  		<input type="hidden" name="next" value="{{ next }}" />
+	</div>
+	<div class="control">
+		<p><a href="{% url 'password_reset' %}">¿Olvidaste la contraseña?</a></p>
+	</div>
+</div>
+</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}

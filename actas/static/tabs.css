@@ -1,0 +1,29 @@
+.panel-tabs:not(:last-child) {
+  margin-bottom: 0;
+}
+
+.tab-content {
+  padding: 1rem;
+  display: none;
+}
+
+.tab-content.is-active {
+  display: block;
+}
+
+#panelsobre p {
+	margin-bottom: 1em;
+}
+
+#panelsobre ul {
+	margin-left: 2em;
+}
+
+@media 
+only screen and (max-width: 768px) {
+
+.tags-grises {
+	display:none;
+}
+
+}

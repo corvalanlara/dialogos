@@ -1,0 +1,350 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block activo_inicio %}is-active{% endblock %}
+
+{% block content%}
+
+{% if messages %}
+<div class="messages">
+{% for message in messages %}
+<article {% if message.tags %} class="{{ message.tags }}"{% endif %} role="alert">
+	<div class="message-header">
+		<p>{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Importante: {% endif %}{{ message }}</p>
+  		<button class="delete" data-dismiss="alert" aria-label="delete">
+    			<span aria-hidden="true">&times;</span>
+  		</button>
+	</div>
+</article>
+{% endfor %}
+</div>
+{% endif %}
+
+<section class="hero is-primary is-medium">
+	<div class="hero-body">
+		<div class="container">
+			<div class="level">
+				<div class="level-left">
+					<div class="level-item">
+						<h1 class="title has-text-centered">
+							Diálogos
+						</h1>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<nav class="panel">
+  <p class="panel-heading has-text-centered is-bold">
+    Repositorios
+  </p>
+  <p role="tablist" class="panel-tabs" aria-label="Tabs de acceso">
+    <a id="tabsobre" role="tab" aria-controls="panelsobre" tabindex="0">Sobre nosotros</a>
+    <a id="tabdocs" role="tab" aria-controls="paneldocs" tabindex="0">Documentos</a>
+    <a id="tabfotos" role="tab" aria-controls="panelfotos" tabindex="0">Fotografías</a>
+  </p>
+
+  <!-- Sobre tab -->
+  <section id="panelsobre" role="tabpanel" class="tab-content" aria-labelledby="tabsobre">
+	<div class="container has-text-justified">
+		<p>
+			Adipisicing culpa placeat neque itaque alias praesentium, quidem corporis praesentium soluta. Officia quis voluptatum quia dolores sapiente Assumenda illum expedita dignissimos tempore similique quaerat. Laboriosam facere illo quisquam enim in!
+		</p>
+		<p>
+			Sit esse odit illo repudiandae optio. Numquam assumenda dicta harum voluptates animi, rem minima nisi Sequi veritatis aspernatur error sit recusandae Enim atque excepturi aspernatur provident quo Assumenda quas perferendis
+		</p>
+		<p>
+			Amet ipsam veniam impedit iste explicabo. Natus vero odit voluptatum incidunt at est Maiores possimus quae labore modi nesciunt suscipit? Reprehenderit ratione illum doloribus ullam id. Iure numquam veniam nostrum.
+		</p>
+		
+		
+    	</div>
+  </section>
+
+
+  <!-- Actas tab -->
+  <section id="paneldocs" role="tabpanel" class="tab-content" aria-labelledby="tabdocs">
+  <span class="tags">
+  {% for tag in tags %}
+  <a class="tag is-rounded is-primary is-link" onclick="toggleTag('{{ tag }}')">{{ tag }}</a>
+  {% endfor %}
+  </span>
+  {% for doc in documentos %}
+  <a tabindex="0" class="button panel-block modal-button {% for tag in doc.tags.all %}{{ tag }} {% endfor %}" data-target="modal-{{ doc.codigo }}" aria-label="Presiona para ver más detalles sobre del archivo {{ doc.titulo }}" aria-haspopup="true">
+       <span class="panel-icon">
+	       <i class="fas {% if doc.link %}fa-link{% else %}fa-book{% endif %}" aria-hidden="true"></i>
+       </span>
+       <p>{{ doc.titulo|truncatechars:35 }}&ensp;</p>
+       <span class="tags tags-grises">
+	       {% for tag in doc.tags.all %}
+	       <span class="tag is-rounded is-light">{{ tag }}</span>
+	       {% endfor %}
+       </span>
+  </a>  	
+  <div class="modal" id="modal-{{ doc.codigo }}">
+	  <div class="modal-background">
+	  </div>
+		<div class="modal-card">
+			<header class="modal-card-head">
+  				<span class="panel-icon">
+					<i class="fas {% if doc.link %}fa-link{% else %}fa-book{% endif %}" aria-hidden="true"></i>
+    				</span>
+				<p class="modal-card-title"> 
+					{{ doc.titulo }}
+				</p>
+				<button class="delete" aria-label="close"></button>
+			</header>
+			<section class="modal-card-body">
+				<p>{{ doc.descripcion }}</p>
+				{% if doc.youtube  %}
+				<figure class="image is-16by9">
+					<iframe class="has-ratio" width="560" height="315" src={{ doc.youtube }} allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+				</figure>
+				{% endif %}
+				<span class="tags">
+       				{% for tag in doc.tags.all %}
+       				<span class="tag is-rounded is-light">{{ tag }}</span>
+       				{% endfor %}
+				</span>
+			</section>
+			<footer class="modal-card-foot">
+				{% if doc.link %}
+				<a class="button" target="_blank" rel="noopener noreferrer" aria-label="Ir al enlace {{ doc.link }}" href="{{ doc.link }}">
+                                        <span class="icon">
+                                                <i class="fas fa-external-link-alt" aria-hidden="true"></i>
+                                        </span>
+                                        </a>
+				{% else %}
+				<a class="button" aria-label="Descarga el archivo {{ doc.titulo }}" href="{{ doc.archivo.url }}" download>
+    					<span class="icon">
+      						<i class="fas fa-download" aria-hidden="true"></i>
+    					</span>
+					</a>
+				{% endif %}
+				{% if user.is_authenticated %}
+
+				<a class="button" aria-label="Edita el archivo {{ doc.titulo }}" href="{% url 'update_acta' doc.pk %}">
+                                        <span class="icon">
+                                                <i class="fas fa-edit" aria-hidden="true"></i>
+                                        </span>
+					</a>
+
+				<form method="POST" action="{% url 'borrar_acta' doc.pk %}" onsubmit="return  confirm('¿Estás seguro?')">
+				{% csrf_token %}
+				<button aria-label="Elimina el archivo {{ doc.titulo }}" class="button">
+                                        <span class="icon">
+                                                <i class="fas fa-trash" aria-hidden="true"></i>
+                                        </span>
+                                </button>
+				</form>
+
+				{% endif %}
+			</footer>
+	</div>
+</div>
+  {% empty %}
+  <p class="panel-block">
+    <span class="panel-icon">
+      <i class="fas fa-folder-open" aria-hidden="true"></i>
+    </span>
+    No hay documentos aún
+  </p>
+  {% endfor %}
+  </section>
+
+  <!-- Fotografías tab -->
+<section id="panelfotos" role="tabpanel" aria-labelledby="tabfotos" class="tab-content">
+{% for trio in fotos %}
+	{% for foto in trio %}
+	{% if forloop.first %}
+	<div class="columns">
+	{% endif %}
+		<div class="column">
+			<figure class="image">
+				<img class="lazyload" data-src="{{ foto.archivo.url }}" alt="{{ foto.descripcion }}" loading="lazy">
+				{% if user.is_authenticated %}
+
+                                <form method="POST" action="{% url 'borrar_foto' foto.pk %}" onsubmit="return  confirm('¿Estás seguro?')">
+                                {% csrf_token %}
+                                <button aria-label="Elimina la foto con la siguiente descripción: {{ doc.descripcion }}" class="button">
+                                        <span class="icon">
+                                                <i class="fas fa-trash" aria-hidden="true"></i>
+                                        </span>
+                                </button>
+                                </form>
+                                {% endif %}
+			</figure>
+		</div>
+	{% if forloop.last %}
+	</div>
+	{% endif %}
+	{% endfor %}
+{% empty %}
+	<div class="box">
+		<p>¡No hemos subido las fotos aún!</p>
+	</div>
+{% endfor %}
+</section>
+
+</nav>
+{% endblock %}
+
+{% block javascript %}
+<script>
+// LAZY LOADING
+  if ('loading' in HTMLImageElement.prototype) {
+    const images = document.querySelectorAll('img[loading="lazy"]');
+    images.forEach(function(img) {
+      img.src = img.dataset.src;
+    });
+  } else {
+    // Dynamically import the LazySizes library
+    const script = document.createElement('script');
+    script.src =
+      'https://cdnjs.cloudflare.com/ajax/libs/lazysizes/4.1.8/lazysizes.min.js';
+    document.body.appendChild(script);
+  }
+
+// MODALS
+document.addEventListener('DOMContentLoaded', function () {
+
+  var rootEl = document.documentElement;
+  var $modals = getAll('.modal');
+  var $modalButtons = getAll('.modal-button');
+  var $modalCloses = getAll('.modal-background, .modal-close, .modal-card-head .delete, .modal-card-foot .button');
+  var iframes = document.getElementsByTagName('iframe');
+
+  if ($modalButtons.length > 0) {
+    $modalButtons.forEach(function ($el) {
+      $el.addEventListener('click', function () {
+        var target = $el.dataset.target;
+        var $target = document.getElementById(target);
+        rootEl.classList.add('is-clipped');
+        $target.classList.add('is-active');
+      });
+      $el.addEventListener('keydown', function(e) {
+	      if(e.keyCode == 13) {
+        	var target = $el.dataset.target;
+        	var $target = document.getElementById(target);
+        	rootEl.classList.add('is-clipped');
+        	$target.classList.add('is-active');
+	      }
+      });
+
+    });
+  }
+
+  if ($modalCloses.length > 0) {
+    $modalCloses.forEach(function ($el) {
+      $el.addEventListener('click', function () {
+        closeModals();
+      });
+    });
+  }
+
+  document.addEventListener('keydown', function (event) {
+    var e = event || window.event;
+    if (e.keyCode === 27) {
+      closeModals();
+    }
+  });
+
+  function closeModals() {
+	  console.log(iframes);
+if (iframes != null) {
+	for (vid of iframes) {
+		vid.src = vid.src;
+	}
+}
+    rootEl.classList.remove('is-clipped');
+    $modals.forEach(function ($el) {
+      $el.classList.remove('is-active');
+    });
+  }
+
+  // Functions
+
+  function getAll(selector) {
+    return Array.prototype.slice.call(document.querySelectorAll(selector), 0);
+  }
+
+});
+
+// TABS
+let tabsWithContent = (function () {
+  let tabs = document.querySelectorAll('.panel-tabs a');
+  let tabsContent = document.querySelectorAll('.tab-content');
+
+  let deactvateAllTabs = function () {
+    tabs.forEach(function (tab) {
+      tab.classList.remove('is-active');
+    });
+  };
+
+  let hideTabsContent = function () {
+    tabsContent.forEach(function (tabContent) {
+      tabContent.classList.remove('is-active');
+    });
+  };
+
+  let activateTabsContent = function (tab) {
+    tabsContent[getIndex(tab)].classList.add('is-active');
+  };
+
+  let getIndex = function (el) {
+    return [...el.parentElement.children].indexOf(el);
+  };
+
+  tabs.forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      deactvateAllTabs();
+      hideTabsContent();
+      tab.classList.add('is-active');
+      activateTabsContent(tab);
+    });
+  })
+ 
+  tabs.forEach(function(tab) {
+	  tab.addEventListener('keydown', function(e) {
+		  if (e.keyCode == 13) {
+		deactvateAllTabs();
+      		hideTabsContent();
+      		tab.classList.add('is-active');
+      		activateTabsContent(tab);
+		}
+	  });
+  })
+
+  tabs[0].click();
+})();
+
+//MESSAGES (sólo uno)
+article = document.querySelector(".message");
+btnMessage = document.querySelector(".message .delete");
+if (btnMessage) {
+	btnMessage.addEventListener('click', function() {
+		article.parentNode.removeChild(article);
+	});
+}
+
+//TAGS
+function toggleTag(nombre) {
+  var x = document.querySelectorAll('.modal-button');
+  for (const nodo of x) {
+	  if (!nodo.classList.contains(nombre)) {
+    			nodo.style.display = "none";
+	  } else {
+		  nodo.style.display = "flex";
+  	  }
+  }
+};
+
+</script>
+{% endblock %}
+
+{% block css %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'tabs.css' %}">
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Adiós - Diálogos {% endblock %}
+
+{% block activo_login %}is-active{% endblock %}
+
+{% block content %}
+
+<div class="section">
+        <div class="container">
+                <div class="columns is-centered is-vcentered">
+                        <div class="column is-narrow has-text-centered">
+                                <div class="box">
+  <p>¡Has salido de tu cuenta!</p>  
+  <a href="{% url 'login'%}">Haz clic aquí para ingresar nuevamente.</a>
+                                </div>
+                        </div>
+                </div>
+        </div>
+</div>
+
+{% endblock %}

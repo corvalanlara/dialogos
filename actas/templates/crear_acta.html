@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load actastag %}
+
+{% block title %}Subir documento - Diálogos {% endblock %}
+
+{% block activo_subir %}is-active{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'form.css' %}">
+{% endblock%}
+
+{% block content %}
+<div class="section">
+<form action="" method="post" enctype="multipart/form-data" id="nueva_acta">
+	{% csrf_token %}
+
+{% for error in form.non_field_errors %}
+<article class="message is-warning">
+        <div class="message-header is-warning">
+		{{ error }}
+                <button type="button" class="delete" data-dismiss="alert" aria-label="delete">
+                        <span aria-hidden="true">&times;</span>
+                </button>
+        </div>
+</article>
+{% endfor %}
+
+	{% for field in form  %}
+		{% if field.html_name == 'archivo' %}
+<div>{{ field.errors }}</div>
+<div id="documento" class="field file has-name">
+	<label class="file-label" for="{{ field.id_for_label }}">
+		{{ field }}
+    <span class="file-cta">
+      <span class="file-icon">
+        <i class="fas fa-upload"></i>
+      </span>
+      <span class="file-label">
+        Selecciona un archivo…
+      </span>
+    </span>
+    <span class="file-name">
+	    {{ field.value|default_if_none:"Sin archivo"}}
+    </span>
+  </label>
+    	{% if field.value %}
+                <button type="button" class="delete" id="delete_doc" data-dismiss="alert" aria-label="delete">
+                        <span aria-hidden="true">&times;</span>
+                </button>
+	{% endif %}
+</div>
+<p class="help-text">{{ field.help_text }}</p>
+		{% elif field.html_name == 'tags' %}
+	<div class="field">
+		<label for="{{ field.id_for_label }}" class="label">{{ field.label }}</label>
+		{{ field.errors }}
+		<input id="id_tags" class="input" type="text" name="tags" list="availabletags" autocomplete="off" value="{{ field.value|get_tags|default_if_none:"" }}" required>
+		{{ field.help_text }}
+	</div>
+	<datalist id="availabletags">
+		{% for tag in tags %}
+		<option value="{{ tag }}">
+		{% endfor %}
+	</datalist>
+		{% else %}
+	<div class="field">
+		<label for="{{ field.id_for_label }}" class="label">{{ field.label }}</label>
+		{{ field.errors }}
+		{{ field }}
+	</div>
+		{% endif %}
+	{% endfor %}
+
+	<div class="field is-grouped ">
+		<div class="control">
+			<button class="button is-link">Subir</button>
+		</div>
+		<div class="control">
+			<a class="button is-link is-light" href="{% url 'inicio' %}">Cancelar</a>
+		</div>
+	</div>
+</form>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script src="{% static 'comun.js' %}"></script>
+{% endblock %}
